@@ -1,0 +1,12 @@
+# Ignorer l'environnement virtuel
+venv/
+
+# Ignorer les fichiers Python compilés
+__pycache__/
+*.pyc
+
+# Ignorer le dossier Tabata cloné
+tabata/
+
+# Ignorer les fichiers spécifiques à l'IDE
+.vscode/
