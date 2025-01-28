@@ -128,30 +128,24 @@ def align_by_phase(reference, target, states):
     """
     aligned_data = []
     for phase in states:
-        # Extraire les données de la phase courante
         ref_phase = reference[reference["Phase"] == phase]
         tgt_phase = target[target["Phase"] == phase]
 
         if len(ref_phase) > 1 and len(tgt_phase) > 1:
-            # Normaliser les indices
             ref_indices = np.linspace(0, 1, len(ref_phase))
             tgt_indices = np.linspace(0, 1, len(tgt_phase))
 
-            # Interpoler les données de la cible pour correspondre à la référence
             interpolated_phase = pd.DataFrame({
                 col: np.interp(ref_indices, tgt_indices, tgt_phase[col])
                 for col in tgt_phase.columns if col != "Phase"
             }, index=ref_phase.index)
 
-            # Ajouter la phase interpolée
             interpolated_phase["Phase"] = phase
             aligned_data.append(interpolated_phase)
 
-    # Combiner toutes les phases alignées
     return pd.concat(aligned_data).sort_index()
 
 
-# Fonction 5 : Visualiser les résultats
 def plot_alignment(reference, target, aligned_data):
     """
     Trace les données de la référence, de la cible et de la cible alignée.
@@ -183,19 +177,15 @@ def calculate_sync_error(reference, aligned_target, value_col="ALT[m]", metric="
     Returns:
         float: L'erreur de synchronisation calculée.
     """
-    # Vérifier que les colonnes existent
     if value_col not in reference.columns or value_col not in aligned_target.columns:
         raise ValueError(f"La colonne '{value_col}' doit exister dans les deux ensembles de données.")
     
-    # Extraire les valeurs des deux ensembles
     ref_values = reference[value_col].values
     tgt_values = aligned_target[value_col].values
     
-    # Vérifier que les longueurs correspondent
     if len(ref_values) != len(tgt_values):
         raise ValueError("Les longueurs des données de référence et de la cible alignée ne correspondent pas.")
     
-    # Calculer l'erreur
     if metric == "RMSE":
         error = np.sqrt(np.mean((ref_values - tgt_values) ** 2))
     elif metric == "MAE":
