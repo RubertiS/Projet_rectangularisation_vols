@@ -4,6 +4,31 @@ import re
 import numpy as np
 import pandas as pd
 
+# ----------------------------------------------
+def norm_data0(x):
+    x0 = np.min(x)
+    x1 = np.max(x)
+    xn = (x-x0)/(x1-x0)
+    return xn
+
+def norm_data1(x):
+    """
+    On essage de mettre 95% des points entre -1 et 1
+    """
+    s = np.std(x)
+    if s>0:
+        xn = np.tanh((x-np.mean(x))/(2*s))
+        xn = norm_data0(xn)
+    else:
+        xn = 0*x
+    return xn
+
+global NORM_DATA 
+
+NORM_DATA = norm_data1
+
+# ----------------------------------------------
+
 def frust_nrm(ds, N):
     '''
     Cette fonction prend en entrée un dataset (Opset) tabata et produit une série de matrices de données renormalisées et rééchantillonnées avec un nombre de point donné.
@@ -18,6 +43,7 @@ def frust_nrm(ds, N):
     *Warning*
         Pas encore de stockage temporaire. Ce sera peut-être nécessaire en fonction du nombre de vols.
     '''
+    global NORM_DATA
 
     cols = [re.sub('\[.*\]','', col) for col in ds.df.columns]
     R = {c : [] for c in cols}
@@ -30,9 +56,7 @@ def frust_nrm(ds, N):
         for V,C in zip(cols,df.columns):
             x = df[C].values
             # Etape de normalisation.
-            x0 = np.min(x)
-            x1 = np.max(x)
-            xn = (x-x0)/(x1-x0)
+            xn = NORM_DATA(x)
             # Etape d'interpolation.
             y = np.interp(t,df.index,xn)
             R[V].append(y)
@@ -105,9 +129,7 @@ def frust_phase_nrm(ds, NL):
         for V,C in zip(cols,df.columns):
             x = df[C].values
             # Etape de normalisation.
-            x0 = np.min(x)
-            x1 = np.max(x)
-            xn = (x-x0)/(x1-x0)
+            xn = NORM_DATA(x)
             # Etape d'interpolation.
             Y = np.array(xn[0])
             for i in range(len(I)-1):
