@@ -30,8 +30,8 @@ def frust_nrm(ds, N):
         for V,C in zip(cols,df.columns):
             x = df[C].values
             # Etape de normalisation.
-            x0 = np.max(x)
-            x1 = np.min(x)
+            x0 = np.min(x)
+            x1 = np.max(x)
             xn = (x-x0)/(x1-x0)
             # Etape d'interpolation.
             y = np.interp(t,df.index,xn)
@@ -105,8 +105,8 @@ def frust_phase_nrm(ds, NL):
         for V,C in zip(cols,df.columns):
             x = df[C].values
             # Etape de normalisation.
-            x0 = np.max(x)
-            x1 = np.min(x)
+            x0 = np.min(x)
+            x1 = np.max(x)
             xn = (x-x0)/(x1-x0)
             # Etape d'interpolation.
             Y = np.array(xn[0])
