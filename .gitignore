@@ -10,6 +10,8 @@ tabata/
 
 Images/
 
+Tests/
+
 # Ignorer les fichiers spécifiques à l'IDE
 .vscode/
 
