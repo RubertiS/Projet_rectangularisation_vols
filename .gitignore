@@ -8,9 +8,9 @@ __pycache__/
 # Ignorer le dossier Tabata cloné
 tabata/
 
+Images/
+
 # Ignorer les fichiers spécifiques à l'IDE
 .vscode/
-
-Data/
 
 Data/dfdr1000
