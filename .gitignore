@@ -11,4 +11,6 @@ tabata/
 # Ignorer les fichiers spécifiques à l'IDE
 .vscode/
 
+Data/
+
 Data/dfdr1000

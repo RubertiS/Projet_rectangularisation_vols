@@ -3,8 +3,11 @@ import pandas as pd
 from fastdtw import fastdtw
 from dtaidistance import dtw
 import matplotlib.pyplot as plt
+from tslearn.barycenters import dtw_barycenter_averaging
+from scipy.interpolate import interp1d
+from dtaidistance import dtw_visualisation as dtwvis
 
-def calculate_dtw(reference, target, col="ALT[m]"):
+def calculate_dtw(reference, target, col="ALT[m]",sens =1):
     """
     Calcule le chemin d'alignement entre la série temporelle de référence et celle de la cible via DTW.
 
@@ -16,15 +19,21 @@ def calculate_dtw(reference, target, col="ALT[m]"):
     Returns:
         tuple: (distance, path), où `distance` est la distance DTW et `path` est le chemin d'alignement.
     """
+    
     ref_values = reference[col].values
     tgt_values = target[col].values
-    
+    if sens !=1 :
+        ref_values = ref_values[::-1]
+        tgt_values = tgt_values[::-1]
     # Calcul de DTW
     #distance, path = fastdtw(ref_values, tgt_values, radius = 1, dist = 2)
-    
-    distance, paths = dtw.warping_paths(reference[col], target[col])
+    distance, paths = dtw.warping_paths(ref_values, tgt_values,window = int(0.02*max(len(target),len(reference))))
+
+    #distance, paths = dtw.warping_paths(reference[col], target[col],window = 1)
     path = dtw.best_path(paths)
     
+    #dtwvis.plot_warpingpaths(ref_values,tgt_values,paths,path)
+
     return distance, path
 
 
@@ -48,8 +57,7 @@ def align_with_dtw(reference, target, path):
     for ref_idx, tgt_idx in path:
         aligned_target.loc[ref_idx] = target.iloc[tgt_idx]
 
-    # On remplit les valeurs manquantes 
-    aligned_target = aligned_target.fillna(method="ffill").fillna(method="bfill")
+    aligned_target = aligned_target.ffill().bfill()
     return aligned_target
 
 

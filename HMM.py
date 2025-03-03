@@ -18,10 +18,9 @@ def align_without_phases(reference, target):
     ref_indices = np.linspace(0, 1, len(reference))
     tgt_indices = np.linspace(0, 1, len(target))
     
-    # Interpolation des colonnes de la cible pour correspondre à la référence
     interpolated_target = pd.DataFrame({
         col: np.interp(ref_indices, tgt_indices, target[col])
-        for col in target.columns if target[col].dtype != 'object'  # Exclure les colonnes non numériques
+        for col in target.columns if target[col].dtype != 'object'  
     }, index=reference.index)
     
     return interpolated_target
@@ -49,7 +48,7 @@ def preprocess_data(data, subset_fraction=0.05, sigma=2):
 
     # Retourner les observations sous forme de tableau
     #observations = np.column_stack([alt, vz, tas, d_alt, d_vz, d_tas])
-    observations = np.column_stack([alt, d_alt, d2_alt])
+    observations = np.column_stack([alt, gaussian_filter1d(d_alt,1), d2_alt])
 
     return data, observations
 
@@ -91,7 +90,10 @@ def detect_phases(data, model, states):
         #np.gradient(data["TAS[m/s]"].values),  # Dérivée de la vitesse sol
     ])
     hidden_states = model.predict(observations)
-    data["Phase"] = [states[state] for state in hidden_states]
+    data = data.copy()
+    data.loc[:, "Phase"] = [states[state] for state in hidden_states]
+
+    #data["Phase"] = [states[state] for state in hidden_states]
     return data
 
 def plot_phases_on_flight(data, phases_col="Phase", value_col="ALT[m]", title="Phases détectées par vol"):
